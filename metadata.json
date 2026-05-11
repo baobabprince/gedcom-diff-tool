@@ -1,0 +1,6 @@
+{
+  "name": "GEDCOM Nexus",
+  "description": "Professional tool for genealogical data comparison. Compare GEDCOM files to find added, removed, or modified ancestors and families.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
