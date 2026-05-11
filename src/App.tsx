@@ -27,90 +27,29 @@ import { motion, AnimatePresence } from 'motion/react';
 import _ from 'lodash';
 import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
 import { parseGedcom, compareGedcoms, GedcomRecord, DiffResult } from './lib/gedcom';
+import { translations, languages } from './lib/translations';
 
 type Tab = 'all' | 'added' | 'removed' | 'modified';
-type Lang = 'he' | 'en';
-
-const translations = {
-  he: {
-    title: 'GEDCOM Nexus',
-    subtitle: 'מנוע השוואה גנאלוגי',
-    restart: 'התחל מחדש',
-    uploadA: 'גרסה ישנה (A)',
-    uploadB: 'גרסה חדשה (B)',
-    chooseFile: 'בחר קובץ GEDCOM',
-    uploadBtn: 'העלה קובץ',
-    heroTitle: 'השוו את עצי המשפחה שלכם',
-    heroDesc: 'העלו שני קבצי GEDCOM כדי לראות בדיוק מה השתנה: אנשים שנוספו, הוסרו או פרטים שעודכנו.',
-    totalChanges: 'סה"כ שינויים',
-    added: 'נוספו',
-    removed: 'הוסרו',
-    modified: 'עודכנו',
-    all: 'הכל',
-    searchPlaceholder: 'חיפוש לפי שם או מזהה...',
-    noResults: 'לא נמצאו שינויים התואמים את החיפוש',
-    indi: 'פרט',
-    fam: 'משפחה',
-    addedLabel: 'נוסף',
-    removedLabel: 'הוסר',
-    modifiedLabel: 'עודכן',
-    originVer: 'גרסת מקור',
-    newVer: 'גרסה חדשה',
-    recordData: 'נתוני הרשומה',
-    parseError: 'שגיאה בפענוח קובץ GEDCOM. אנא וודא שהקובץ תקין.',
-    more: 'נוספים',
-    records: 'רשומות',
-    viewSmart: 'תצוגה חכמה',
-    viewDiff: 'צד מול צד',
-    viewRaw: 'נתונים גולמיים',
-    original: 'מקור',
-    updated: 'מעודכן'
-  },
-  en: {
-    title: 'GEDCOM Nexus',
-    subtitle: 'Genealogical Comparison Engine',
-    restart: 'Restart',
-    uploadA: 'Old Version (A)',
-    uploadB: 'New Version (B)',
-    chooseFile: 'Choose GEDCOM File',
-    uploadBtn: 'Upload File',
-    heroTitle: 'Compare Your Family Trees',
-    heroDesc: 'Upload two GEDCOM files to see exactly what changed: added or removed individuals, or updated details.',
-    totalChanges: 'Total Changes',
-    added: 'Added',
-    removed: 'Removed',
-    modified: 'Modified',
-    all: 'All',
-    searchPlaceholder: 'Search by name or ID...',
-    noResults: 'No changes found matching your search',
-    indi: 'Individual',
-    fam: 'Family',
-    addedLabel: 'Added',
-    removedLabel: 'Removed',
-    modifiedLabel: 'Modified',
-    originVer: 'Original Version',
-    newVer: 'New Version',
-    recordData: 'Record Data',
-    parseError: 'Error parsing GEDCOM file. Please ensure the file is valid.',
-    more: 'more',
-    records: 'Records',
-    viewSmart: 'Smart View',
-    viewDiff: 'Side by Side',
-    viewRaw: 'Raw Data',
-    original: 'Original',
-    updated: 'Updated'
-  }
-};
 
 export default function App() {
-  const [lang, setLang] = useState<Lang>('he');
+  const [lang, setLang] = useState('en');
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [langSearch, setLangSearch] = useState('');
   const [fileA, setFileA] = useState<{ name: string; records: GedcomRecord[] } | null>(null);
   const [fileB, setFileB] = useState<{ name: string; records: GedcomRecord[] } | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const t = translations[lang];
+  const t = translations[lang] || translations.en;
+
+  const filteredLanguages = useMemo(() => {
+    if (!langSearch) return languages;
+    return languages.filter(l => 
+      l.name.toLowerCase().includes(langSearch.toLowerCase()) || 
+      l.code.toLowerCase().includes(langSearch.toLowerCase())
+    );
+  }, [langSearch]);
 
   const fileAMap = useMemo(() => _.keyBy(fileA?.records || [], 'id'), [fileA]);
   const fileBMap = useMemo(() => _.keyBy(fileB?.records || [], 'id'), [fileB]);
@@ -202,8 +141,7 @@ export default function App() {
     return items;
   }, [diff, activeTab, search, lang]);
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>, side: 'A' | 'B') => {
-    const file = e.target.files?.[0];
+  const handleFile = async (file: File | undefined, side: 'A' | 'B') => {
     if (!file) return;
 
     try {
@@ -220,10 +158,14 @@ export default function App() {
     }
   };
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, side: 'A' | 'B') => {
+    handleFile(e.target.files?.[0], side);
+  };
+
   return (
     <div 
       className="min-h-screen bg-[#F5F5F0] text-[#141414] font-sans selection:bg-[#141414] selection:text-[#E4E3E0]" 
-      dir={lang === 'he' ? 'rtl' : 'ltr'}
+      dir={['he', 'ar', 'fa'].includes(lang) ? 'rtl' : 'ltr'}
     >
       {/* Header */}
       <header className="border-b border-[#141414]/10 bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -238,19 +180,66 @@ export default function App() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
             <button 
-              onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
+              onClick={() => setShowLanguagePicker(!showLanguagePicker)}
               className="p-2 hover:bg-[#141414]/5 rounded-lg transition-colors flex items-center gap-2 text-xs font-mono uppercase tracking-widest"
             >
               <Languages className="w-4 h-4" />
-              {lang === 'he' ? 'English' : 'עברית'}
+              {languages.find(l => l.code === lang)?.name || 'Language'}
             </button>
+
+            <AnimatePresence>
+              {showLanguagePicker && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-2 w-64 bg-white rounded-2xl border border-[#141414]/10 shadow-2xl overflow-hidden z-[100]"
+                >
+                  <div className="p-3 border-b border-[#141414]/5">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-30" />
+                      <input 
+                        autoFocus
+                        type="text"
+                        placeholder="Search language..."
+                        className="w-full bg-[#F5F5F0] border-none rounded-lg py-1.5 pl-9 pr-3 text-xs focus:ring-0"
+                        value={langSearch}
+                        onChange={(e) => setLangSearch(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto p-1">
+                    {filteredLanguages.map(l => (
+                      <button
+                        key={l.code}
+                        onClick={() => {
+                          setLang(l.code);
+                          setShowLanguagePicker(false);
+                          setLangSearch('');
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-colors ${
+                          lang === l.code ? 'bg-[#141414] text-white' : 'hover:bg-[#141414]/5'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-sm">{l.flag}</span>
+                          {l.name}
+                        </span>
+                        {lang === l.code && <CheckCircle2 className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <button 
               onClick={() => { setFileA(null); setFileB(null); }}
               className="text-xs uppercase tracking-widest font-mono opacity-50 hover:opacity-100 transition-opacity"
             >
-              {t.restart}
+              {t.restart || 'Restart'}
             </button>
           </div>
         </div>
@@ -258,37 +247,60 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {!fileA || !fileB ? (
-          <div className="grid md:grid-cols-2 gap-8 mt-12">
-            <UploadCard 
-              id="file-a" 
-              label={t.uploadA} 
-              fileName={fileA?.name} 
-              onUpload={(e) => handleFileChange(e, 'A')}
-              t={t}
-            />
-            <UploadCard 
-              id="file-b" 
-              label={t.uploadB} 
-              fileName={fileB?.name} 
-              onUpload={(e) => handleFileChange(e, 'B')}
-              t={t}
-            />
+          <div className="space-y-12 mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="grid md:grid-cols-2 gap-8">
+              <UploadCard 
+                id="file-a" 
+                label={t.fileA} 
+                fileName={fileA?.name} 
+                onUpload={(e) => handleFileChange(e, 'A')}
+                onDrop={(file) => handleFile(file, 'A')}
+                t={t}
+              />
+              <UploadCard 
+                id="file-b" 
+                label={t.fileB} 
+                fileName={fileB?.name} 
+                onUpload={(e) => handleFileChange(e, 'B')}
+                onDrop={(file) => handleFile(file, 'B')}
+                t={t}
+              />
+            </div>
             
-            <div className="md:col-span-2 bg-[#141414] text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-              <div className="relative z-10">
-                <h2 className="text-3xl font-serif italic mb-2">{t.heroTitle}</h2>
-                <p className="opacity-70 max-w-md">{t.heroDesc}</p>
+            <div className="bg-[#141414] text-white p-12 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-12 overflow-hidden relative shadow-2xl">
+              <div className="relative z-10 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-[10px] uppercase tracking-widest font-mono">
+                  <Info className="w-3 h-3" />
+                  {t.howToUse}
+                </div>
+                <h2 className="text-4xl font-serif italic">{t.heroTitle}</h2>
+                <p className="opacity-70 max-w-md text-lg leading-relaxed">{t.heroDesc}</p>
+                
+                <div className="space-y-4 mt-8">
+                  {[
+                    { icon: <Plus className="w-4 h-4" />, text: t.step1 },
+                    { icon: <Plus className="w-4 h-4" />, text: t.step2 },
+                    { icon: <RefreshCcw className="w-4 h-4" />, text: t.step3 },
+                  ].map((step, i) => (
+                    <div key={i} className="flex items-center gap-4 text-sm opacity-60">
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                        {step.icon}
+                      </div>
+                      <p>{step.text}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex -space-x-4 ltr:space-x-0 rtl:space-x-reverse relative z-10">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-[#141414] bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <User className="w-6 h-6 opacity-50" />
+              <div className="flex -space-x-6 ltr:space-x-0 rtl:space-x-reverse relative z-10 pr-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className={`w-20 h-20 rounded-full border-8 border-[#141414] bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl flex items-center justify-center shadow-xl transform hover:-translate-y-2 transition-transform duration-500 delay-${i * 100}`}>
+                    <User className="w-8 h-8 opacity-40" />
                   </div>
                 ))}
               </div>
-              {/* Decorative background element */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+              {/* Decorative background elements */}
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-500/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full -ml-48 -mb-48 blur-[100px]"></div>
             </div>
           </div>
         ) : (
@@ -415,21 +427,85 @@ export default function App() {
   );
 }
 
-function UploadCard({ id, label, fileName, onUpload, t }: { id: string; label: string; fileName?: string; onUpload: (e: ChangeEvent<HTMLInputElement>) => void; t: any }) {
+function UploadCard({ id, label, fileName, onUpload, onDrop, t }: { id: string; label: string; fileName?: string; onUpload: (e: ChangeEvent<HTMLInputElement>) => void; onDrop: (file: File) => void; t: any }) {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setIsDragging(true);
+    } else if (e.type === 'dragleave') {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.name.endsWith('.ged')) {
+      onDrop(file);
+    } else {
+      alert(t.parseError);
+    }
+  };
+
   return (
-    <div className="bg-white p-8 rounded-3xl border border-[#141414]/5 flex flex-col items-center justify-center text-center gap-4 group transition-all hover:shadow-xl hover:-translate-y-1">
-      <div className={`p-5 rounded-2xl transition-all ${fileName ? 'bg-green-50 text-green-500' : 'bg-[#F5F5F0] text-[#141414]/30 group-hover:bg-[#141414] group-hover:text-white'}`}>
-        {fileName ? <CheckCircle2 className="w-8 h-8" /> : <FileUp className="w-8 h-8" />}
+    <div 
+      className={`relative bg-white p-10 rounded-[3rem] border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center text-center gap-6 group overflow-hidden ${
+        isDragging 
+          ? 'border-[#141414] bg-[#141414]/5 scale-[1.02] shadow-2xl' 
+          : 'border-[#141414]/5 hover:border-[#141414]/20 hover:shadow-xl hover:-translate-y-1'
+      }`}
+      onDragEnter={handleDrag}
+      onDragLeave={handleDrag}
+      onDragOver={handleDrag}
+      onDrop={handleDrop}
+    >
+      {/* Visual Feedback Circles for Dragging */}
+      {isDragging && (
+        <motion.div 
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="absolute inset-0 bg-[#141414] text-white flex flex-col items-center justify-center z-10"
+        >
+          <FileUp className="w-16 h-16 mb-4 animate-bounce" />
+          <p className="font-serif italic text-xl">{t.dropFiles}</p>
+        </motion.div>
+      )}
+
+      <div className={`p-6 rounded-[2rem] transition-all duration-500 ${
+        fileName 
+          ? 'bg-green-50 text-green-500 rotate-12' 
+          : 'bg-[#F5F5F0] text-[#141414]/30 group-hover:bg-[#141414] group-hover:text-white group-hover:-rotate-12'
+      }`}>
+        {fileName ? <CheckCircle2 className="w-10 h-10" /> : <FileUp className="w-10 h-10" />}
       </div>
-      <div>
-        <span className="text-[10px] uppercase font-mono tracking-widest opacity-40 block mb-1">{label}</span>
-        <h3 className="font-serif italic text-lg">{fileName || t.chooseFile}</h3>
+      
+      <div className="space-y-2">
+        <span className="text-[10px] uppercase font-mono tracking-[0.2em] opacity-40 block">{label}</span>
+        <h3 className="font-serif italic text-2xl truncate max-w-[250px]">{fileName || t.chooseFile}</h3>
+        <p className="text-[10px] font-mono opacity-30 mt-2 max-w-[200px] mx-auto leading-relaxed">
+          {t.dragDrop}
+        </p>
       </div>
-      <label htmlFor={id} className="cursor-pointer bg-[#141414] text-white px-6 py-2 rounded-full text-sm font-medium hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-black/10">
+
+      <label 
+        htmlFor={id} 
+        className="cursor-pointer bg-[#141414] text-white px-8 py-3 rounded-2xl text-xs font-mono uppercase tracking-[0.1em] hover:scale-105 transition-all active:scale-95 shadow-xl shadow-black/10 flex items-center gap-3"
+      >
+        <Plus className="w-4 h-4" />
         {t.uploadBtn}
         <input id={id} type="file" accept=".ged" className="hidden" onChange={onUpload} />
       </label>
-      {fileName && <p className="text-[10px] font-mono opacity-40 mt-2 truncate max-w-[200px]">{fileName}</p>}
+
+      {/* Decorative Background for empty state */}
+      {!fileName && (
+        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#141414]/5 rounded-full blur-2xl group-hover:bg-[#141414]/10 transition-colors"></div>
+      )}
     </div>
   );
 }
