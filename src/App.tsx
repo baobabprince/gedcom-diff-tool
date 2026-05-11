@@ -512,8 +512,27 @@ function UploadCard({ id, label, fileName, onUpload, onDrop, t }: { id: string; 
 
 const dmp = new DiffMatchPatch();
 
-function ClassicDiff({ oldText, newText, t }: { oldText: string, newText: string, t: any }) {
-  const diffs = dmp.diff_main(oldText, newText);
+function sortObject(obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortObject);
+  }
+  const sortedKeys = Object.keys(obj).sort();
+  const result: any = {};
+  sortedKeys.forEach(key => {
+    result[key] = sortObject(obj[key]);
+  });
+  return result;
+}
+
+function ClassicDiff({ oldText, newText, t, oldData, newData }: { oldText: string, newText: string, t: any, oldData?: any, newData?: any }) {
+  // If data is provided, use sorted JSON for stable diffing
+  const leftText = oldData ? JSON.stringify(sortObject(oldData), null, 2) : oldText;
+  const rightText = newData ? JSON.stringify(sortObject(newData), null, 2) : newText;
+  
+  const diffs = dmp.diff_main(leftText, rightText);
   dmp.diff_cleanupSemantic(diffs);
 
   // Split logic for side-by-side
@@ -688,8 +707,10 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
                   
                   {viewMode === 'diff' && (
                     <ClassicDiff 
-                      oldText={JSON.stringify(item.oldData, null, 2)} 
-                      newText={JSON.stringify(item.newData, null, 2)} 
+                      oldText="" 
+                      newText="" 
+                      oldData={item.oldData}
+                      newData={item.newData}
                       t={t}
                     />
                   )}

@@ -155,6 +155,23 @@ function getTagName(tag: string): string {
   return TAG_MAPPING[tag] || tag;
 }
 
+function isEqualUnordered(objValue: any, othValue: any): boolean | undefined {
+  if (Array.isArray(objValue) && Array.isArray(othValue)) {
+    if (objValue.length !== othValue.length) return false;
+    const copiedOther = [...othValue];
+    for (const v of objValue) {
+      const index = copiedOther.findIndex(o => _.isEqualWith(v, o, isEqualUnordered));
+      if (index !== -1) {
+        copiedOther.splice(index, 1);
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+  return undefined;
+}
+
 export function compareGedcoms(oldRecords: GedcomRecord[], newRecords: GedcomRecord[]): DiffResult {
   const oldMap = _.keyBy(oldRecords, 'id');
   const newMap = _.keyBy(newRecords, 'id');
@@ -174,7 +191,7 @@ export function compareGedcoms(oldRecords: GedcomRecord[], newRecords: GedcomRec
     } else if (oldRec && !newRec) {
       removed.push(oldRec);
     } else if (oldRec && newRec) {
-      if (!_.isEqual(oldRec.data, newRec.data)) {
+      if (!_.isEqualWith(oldRec.data, newRec.data, isEqualUnordered)) {
         const changes = getDetailedChanges(oldRec.data, newRec.data);
         if (changes.length > 0) {
           modified.push({
@@ -200,7 +217,7 @@ function getDetailedChanges(oldData: any, newData: any, prefix = '', humanPrefix
     const oldVal = oldData[key];
     const newVal = newData[key];
 
-    if (!_.isEqual(oldVal, newVal)) {
+    if (!_.isEqualWith(oldVal, newVal, isEqualUnordered)) {
       const humanKey = getTagName(key);
       const currentHumanPath = `${humanPrefix}${humanKey}`;
       const currentPath = `${prefix}${key}`;
