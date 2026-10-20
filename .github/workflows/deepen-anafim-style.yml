@@ -1,0 +1,149 @@
+name: Deepen anafim style
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restyle App.tsx toward anafim
+        run: |
+          python3 << 'PY'
+          from pathlib import Path
+          p = Path('src/App.tsx')
+          t = p.read_text()
+
+          # Fix broken replacements from earlier pass
+          t = t.replace('bg-[#f8eee5]0/10', 'bg-[#ac694c]/10')
+          t = t.replace('bg-[#edf1e9]0', 'bg-[#edf1e9]')
+          t = t.replace('bg-[#f8eee5]0', 'bg-[#f8eee5]')
+          t = t.replace('border-[#141414]', 'border-[#e7e8e0]')
+          t = t.replace('focus:ring-[#141414]/10', 'focus:ring-[#b47e59]')
+
+          # Typography: drop serif-italic + mono tracking for Heebo feel
+          t = t.replace('font-serif italic text-xl', 'font-semibold text-xl')
+          t = t.replace('font-serif italic text-2xl', 'font-semibold text-2xl')
+          t = t.replace('font-serif italic text-4xl', 'font-bold text-3xl md:text-4xl')
+          t = t.replace('font-serif italic text-lg', 'text-lg')
+          t = t.replace('font-serif', 'font-semibold')
+          t = t.replace('uppercase tracking-widest font-mono', 'font-medium')
+          t = t.replace('uppercase tracking-wider font-mono', 'font-medium')
+          t = t.replace('text-[10px] uppercase tracking-wider opacity-50 font-mono', 'text-[11px] opacity-60')
+          t = t.replace('text-[10px] uppercase tracking-widest font-mono', 'text-[11px] font-medium')
+          t = t.replace('text-[9px] uppercase font-mono', 'text-[10px]')
+          t = t.replace('text-xs font-mono uppercase tracking-widest', 'text-xs font-medium')
+          t = t.replace('text-xs uppercase tracking-widest font-mono', 'text-xs font-medium')
+          t = t.replace('text-xs font-mono uppercase tracking-wider', 'text-xs font-medium')
+
+          # Radii closer to anafim (12–16px family)
+          t = t.replace('rounded-[3rem]', 'rounded-2xl')
+          t = t.replace('rounded-[2.5rem]', 'rounded-2xl')
+          t = t.replace('rounded-[2rem]', 'rounded-xl')
+
+          # Primary actions: clay instead of sage blocks where it reads as CTA
+          # Hero panel: soft paper + clay accent instead of solid dark sage
+          t = t.replace(
+              'bg-[#456352] text-white p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-12 overflow-hidden relative shadow-2xl',
+              'bg-[#fefefb] text-[#29392f] p-10 rounded-2xl border border-[#e7e8e0] flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative shadow-[0_4px_18px_#29392f14]',
+          )
+          # if the previous line didn't match because of earlier edits, try original sage block still in file
+          t = t.replace(
+              'className="bg-[#456352] text-white p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-12 overflow-hidden relative shadow-2xl"',
+              'className="bg-[#fefefb] text-[#29392f] p-10 rounded-2xl border border-[#e7e8e0] flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative shadow-[0_4px_18px_#29392f14]"',
+          )
+
+          # Brand mark: soft green light chip like anafim saved-file icon
+          t = t.replace(
+              'w-10 h-10 bg-[#456352] rounded-lg flex items-center justify-center text-white',
+              'w-10 h-10 bg-[#edf1e9] rounded-xl flex items-center justify-center text-[#456352]',
+          )
+
+          # Upload drag state / primary upload affordance → clay
+          t = t.replace(
+              "? 'border-[#e7e8e0] bg-[#456352]/5 scale-[1.02] shadow-2xl'",
+              "? 'border-[#ac694c] bg-[#f8eee5] scale-[1.01] shadow-[0_4px_18px_#29392f14]'",
+          )
+          t = t.replace(
+              "? 'border-[#141414] bg-[#456352]/5 scale-[1.02] shadow-2xl'",
+              "? 'border-[#ac694c] bg-[#f8eee5] scale-[1.01] shadow-[0_4px_18px_#29392f14]'",
+          )
+          t = t.replace(
+              'absolute inset-0 bg-[#456352] text-white flex flex-col items-center justify-center z-10',
+              'absolute inset-0 bg-[#ac694c] text-white flex flex-col items-center justify-center z-10',
+          )
+          t = t.replace(
+              ": 'bg-[#f8f7f3] text-[#29392f]/30 group-hover:bg-[#456352] group-hover:text-white group-hover:-rotate-12'",
+              ": 'bg-[#edf1e9] text-[#456352]/50 group-hover:bg-[#ac694c] group-hover:text-white'",
+          )
+
+          # Tabs selected: clay primary
+          t = t.replace(
+              "? 'bg-[#456352] text-white shadow-lg'",
+              "? 'bg-[#ac694c] text-white shadow-sm'",
+          )
+          # language selected chip
+          t = t.replace(
+              "lang === l.code ? 'bg-[#456352] text-white' : 'hover:bg-[#456352]/5'",
+              "lang === l.code ? 'bg-[#ac694c] text-white' : 'hover:bg-[#edf1e9]'",
+          )
+
+          # Soften card shadows to anafim
+          t = t.replace('shadow-sm', "shadow-[0_2px_7px_#344d2508]")
+          t = t.replace('shadow-2xl', "shadow-[0_4px_18px_#29392f14]")
+
+          p.write_text(t)
+          print('App restyled', p.stat().st_size)
+          PY
+
+      - name: Enrich index.css with anafim utilities
+        run: |
+          cat >> src/index.css << 'EOF'
+
+          /* anafim-aligned utilities */
+          body {
+            font-family: "Heebo", system-ui, -apple-system, Arial, sans-serif;
+            background: #f8f7f3;
+            color: #29392f;
+          }
+
+          .baobab-card {
+            background: #ffffff;
+            border: 1px solid #e7e8e0;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px #33492208;
+          }
+
+          .baobab-btn {
+            background: #ac694c;
+            color: #fff;
+            border-radius: 10px;
+            padding: 0.65rem 1.25rem;
+            font-weight: 600;
+            transition: background 0.15s ease;
+          }
+          .baobab-btn:hover { background: #93583f; }
+
+          .baobab-chip {
+            background: #edf1e9;
+            color: #456352;
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-size: 12px;
+            font-weight: 500;
+          }
+          EOF
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo no-changes && exit 0
+          git commit -m "style: deeper anafim alignment — clay CTAs, paper cards, Heebo"
+          git push origin HEAD:main
