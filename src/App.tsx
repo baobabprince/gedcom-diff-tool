@@ -207,6 +207,20 @@ export default function App() {
     handleFile(e.target.files?.[0], side);
   };
 
+
+  React.useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('baobab') === 'shared') {
+        handleLoadShared('A');
+        params.delete('baobab');
+        const next = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (next ? '?' + next : '') + window.location.hash);
+      }
+    } catch (_) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div 
       className="min-h-screen bg-[#f8f7f3] text-[#29392f] font-sans selection:bg-[#e3d3bd] selection:text-[#29392f]" 
