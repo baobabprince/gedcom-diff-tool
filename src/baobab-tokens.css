@@ -1,0 +1,16 @@
+:root {
+  --bg: #f8f7f3;
+  --paper: #ffffff;
+  --paper-warm: #fefefb;
+  --text: #29392f;
+  --muted: #82877e;
+  --line: #e7e8e0;
+  --green: #456352;
+  --green-light: #edf1e9;
+  --clay: #ac694c;
+  --clay-dark: #93583f;
+  --clay-light: #f8eee5;
+  --shadow: 0 4px 18px #29392f14;
+  --font-sans: "Heebo", system-ui, -apple-system, Arial, sans-serif;
+  --radius-md: 12px;
+}

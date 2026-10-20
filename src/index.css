@@ -1,1 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Serif+Hebrew:ital,wght@0,400;0,600;1,400&display=swap');
 @import "tailwindcss";
+@import "./baobab-tokens.css";
+
+@theme {
+  --font-sans: "Heebo", system-ui, sans-serif;
+  --font-serif: "Noto Serif Hebrew", Georgia, serif;
+}
+
+html, body, #root {
+  min-height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: #e3d3bd;
+  color: var(--text);
+}
