@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -19,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -34,9 +38,19 @@ jobs:
         env:
           BASE_URL: ./
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
+      - name: Publish dist into docs/
+        run: |
+          set -euo pipefail
+          rm -rf docs
+          mkdir -p docs
+          cp -R dist/* docs/
+          touch docs/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "No docs changes"
+            exit 0
+          fi
+          git commit -m "build: publish production site to docs/ for GitHub Pages"
+          git push origin HEAD:main
