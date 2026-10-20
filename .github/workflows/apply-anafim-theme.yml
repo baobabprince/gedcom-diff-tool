@@ -1,0 +1,136 @@
+name: Apply anafim theme
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write tokens + CSS + HTML
+        run: |
+          cat > src/baobab-tokens.css << 'EOF'
+          :root {
+            --bg: #f8f7f3;
+            --paper: #ffffff;
+            --paper-warm: #fefefb;
+            --text: #29392f;
+            --muted: #82877e;
+            --line: #e7e8e0;
+            --green: #456352;
+            --green-light: #edf1e9;
+            --clay: #ac694c;
+            --clay-dark: #93583f;
+            --clay-light: #f8eee5;
+            --shadow: 0 4px 18px #29392f14;
+            --font-sans: "Heebo", system-ui, -apple-system, Arial, sans-serif;
+            --radius-md: 12px;
+          }
+          EOF
+
+          cat > src/index.css << 'EOF'
+          @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Serif+Hebrew:ital,wght@0,400;0,600;1,400&display=swap');
+          @import "tailwindcss";
+          @import "./baobab-tokens.css";
+
+          @theme {
+            --font-sans: "Heebo", system-ui, sans-serif;
+            --font-serif: "Noto Serif Hebrew", Georgia, serif;
+          }
+
+          html, body, #root {
+            min-height: 100%;
+            margin: 0;
+          }
+          body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+          }
+          ::selection {
+            background: #e3d3bd;
+            color: var(--text);
+          }
+          EOF
+
+          cat > index.html << 'EOF'
+          <!doctype html>
+          <html lang="he" dir="rtl">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>GED Diff — השוואת קבצי GEDCOM</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Serif+Hebrew:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+            </head>
+            <body class="bg-[#f8f7f3] text-[#29392f]">
+              <div id="root"></div>
+              <script type="module" src="/src/main.tsx"></script>
+            </body>
+          </html>
+          EOF
+
+      - name: Remap App.tsx colors to anafim
+        run: |
+          python3 << 'PY'
+          from pathlib import Path
+          p = Path('src/App.tsx')
+          t = p.read_text()
+          reps = [
+              ('bg-[#F5F5F0]', 'bg-[#f8f7f3]'),
+              ('text-[#141414]', 'text-[#29392f]'),
+              ('selection:bg-[#141414] selection:text-[#E4E3E0]', 'selection:bg-[#e3d3bd] selection:text-[#29392f]'),
+              ('border-[#141414]/10', 'border-[#e7e8e0]'),
+              ('border-[#141414]/5', 'border-[#e7e8e0]'),
+              ('border-[#141414]/20', 'border-[#d6e2cd]'),
+              ('bg-[#141414]', 'bg-[#456352]'),
+              ('bg-[#141414]/5', 'bg-[#edf1e9]'),
+              ('hover:bg-[#141414]', 'hover:bg-[#315b48]'),
+              ('text-[#141414]/60', 'text-[#82877e]'),
+              ('text-[#141414]/40', 'text-[#a4a79f]'),
+              ('bg-white/80', 'bg-[#fefefb]/90'),
+              ('bg-white', 'bg-[#fefefb]'),
+              # keep semantic diff colors but soften to anafim-ish
+              ('bg-green-50', 'bg-[#edf1e9]'),
+              ('bg-green-100', 'bg-[#e9f0e5]'),
+              ('text-green-900', 'text-[#315b48]'),
+              ('text-green-800', 'text-[#456352]'),
+              ('text-green-700', 'text-[#456352]'),
+              ('text-green-600', 'text-[#74975e]'),
+              ('bg-red-50', 'bg-[#f8eee5]'),
+              ('bg-red-100', 'bg-[#f0e0d4]'),
+              ('text-red-900', 'text-[#93583f]'),
+              ('text-red-800', 'text-[#ac694c]'),
+              ('text-red-700', 'text-[#ac694c]'),
+              ('text-red-600', 'text-[#ac694c]'),
+              ('bg-amber-50', 'bg-[#f8eee5]'),
+              ('text-amber-700', 'text-[#ac694c]'),
+              ('text-amber-600', 'text-[#ac694c]'),
+              ('bg-amber-500', 'bg-[#ac694c]'),
+              ('bg-blue-500', 'bg-[#456352]'),
+              ('bg-amber-500/10', 'bg-[#ac694c]/10'),
+              ('bg-blue-500/10', 'bg-[#456352]/10'),
+          ]
+          for a, b in reps:
+              t = t.replace(a, b)
+          p.write_text(t)
+          print('App patched', p.stat().st_size)
+          print('cream', 'f8f7f3' in t)
+          print('sage', '456352' in t)
+          PY
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status
+          git diff --cached --quiet && echo no-changes && exit 0
+          git commit -m "style: align with anafim (ענפים) cream/sage/clay palette"
+          git push origin HEAD:main
