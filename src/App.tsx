@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import _ from 'lodash';
 import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
 import { parseGedcom, compareGedcoms, GedcomRecord, DiffResult } from './lib/gedcom';
+import { saveSharedExport, loadSharedExport, hasSharedExport, formatSharedSummary } from './lib/baobabSharedStorage';
 import { translations, languages } from './lib/translations';
 
 type Tab = 'all' | 'added' | 'removed' | 'modified';
@@ -150,11 +151,55 @@ export default function App() {
       if (records.length === 0) {
         throw new Error('No records found');
       }
-      if (side === 'A') setFileA({ name: file.name, records });
-      else setFileB({ name: file.name, records });
+      if (side === 'A') setFileA({ name: file.name, records, raw: text });
+      else setFileB({ name: file.name, records, raw: text });
+      try {
+        saveSharedExport({
+          source: 'gedcom-diff',
+          filename: file.name,
+          gedcom: text,
+          meta: { personCount: records.filter((r: any) => r.tag === 'INDI').length, title: file.name },
+        });
+      } catch (_) {}
     } catch (err) {
       console.error(err);
       alert(t.parseError);
+    }
+  };
+
+  const handleLoadShared = (side: 'A' | 'B' = 'A') => {
+    const shared = loadSharedExport();
+    if (!shared?.gedcom) {
+      alert(lang === 'he' ? 'אין נתונים משותפים לטעינה.' : 'No shared data.');
+      return;
+    }
+    try {
+      const records = parseGedcom(shared.gedcom);
+      if (records.length === 0) throw new Error('empty');
+      const payload = { name: shared.filename || 'shared.ged', records, raw: shared.gedcom };
+      if (side === 'A') setFileA(payload);
+      else setFileB(payload);
+    } catch (err) {
+      console.error(err);
+      alert(t.parseError);
+    }
+  };
+
+  const handleSaveShared = (side: 'A' | 'B' = 'A') => {
+    const f = side === 'A' ? fileA : fileB;
+    if (!f || !(f as any).raw) {
+      alert(lang === 'he' ? 'יש לטעון קובץ תחילה.' : 'Load a file first.');
+      return;
+    }
+    try {
+      saveSharedExport({
+        source: 'gedcom-diff',
+        filename: f.name,
+        gedcom: (f as any).raw,
+        meta: { personCount: f.records.filter((r: any) => r.tag === 'INDI').length },
+      });
+    } catch (_) {
+      alert(lang === 'he' ? 'שמירה נכשלה.' : 'Save failed.');
     }
   };
 
@@ -267,6 +312,17 @@ export default function App() {
               />
             </div>
             
+                        <div className="mt-6 p-4 rounded-2xl border border-[#e7e8e0] bg-[#fefefb]">
+              <p className="text-xs font-semibold text-[#456352] mb-1">שיתוף בין אפליקציות (localStorage)</p>
+              <p className="text-[11px] text-[#82877e] mb-3 truncate">{formatSharedSummary(loadSharedExport()) || 'אין נתונים משותפים עדיין'}</p>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => handleLoadShared('A')} className="text-xs px-3 py-2 rounded-xl bg-[#edf1e9] text-[#456352] font-medium">טען מהשיתוף → A</button>
+                <button type="button" onClick={() => handleLoadShared('B')} className="text-xs px-3 py-2 rounded-xl bg-[#edf1e9] text-[#456352] font-medium">טען מהשיתוף → B</button>
+                <button type="button" onClick={() => handleSaveShared('A')} className="text-xs px-3 py-2 rounded-xl bg-[#ac694c] text-white font-medium">שמור A לשיתוף</button>
+                <button type="button" onClick={() => handleSaveShared('B')} className="text-xs px-3 py-2 rounded-xl bg-[#ac694c] text-white font-medium">שמור B לשיתוף</button>
+              </div>
+            </div>
+
             <div className="bg-[#fefefb] text-[#29392f] p-10 rounded-2xl border border-[#e7e8e0] flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative shadow-[0_4px_18px_#29392f14]">
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#fefefb]/10 rounded-full text-[10px] font-medium">
