@@ -21,3 +21,36 @@ body {
   background: #e3d3bd;
   color: var(--text);
 }
+
+/* anafim-aligned utilities */
+body {
+  font-family: "Heebo", system-ui, -apple-system, Arial, sans-serif;
+  background: #f8f7f3;
+  color: #29392f;
+}
+
+.baobab-card {
+  background: #ffffff;
+  border: 1px solid #e7e8e0;
+  border-radius: 16px;
+  box-shadow: 0 3px 15px #33492208;
+}
+
+.baobab-btn {
+  background: #ac694c;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+.baobab-btn:hover { background: #93583f; }
+
+.baobab-chip {
+  background: #edf1e9;
+  color: #456352;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+}

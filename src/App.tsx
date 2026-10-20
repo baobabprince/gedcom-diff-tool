@@ -171,19 +171,19 @@ export default function App() {
       <header className="border-b border-[#e7e8e0] bg-[#fefefb]/90 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#456352] rounded-lg flex items-center justify-center text-white">
+            <div className="w-10 h-10 bg-[#edf1e9] rounded-xl flex items-center justify-center text-[#456352]">
               <RefreshCcw className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="font-serif italic text-xl leading-tight">{t.title}</h1>
-              <p className="text-[10px] uppercase tracking-wider opacity-50 font-mono"> {t.subtitle}</p>
+              <h1 className="font-semibold text-xl leading-tight">{t.title}</h1>
+              <p className="text-[11px] opacity-60"> {t.subtitle}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4 relative">
             <button 
               onClick={() => setShowLanguagePicker(!showLanguagePicker)}
-              className="p-2 hover:bg-[#456352]/5 rounded-lg transition-colors flex items-center gap-2 text-xs font-mono uppercase tracking-widest"
+              className="p-2 hover:bg-[#456352]/5 rounded-lg transition-colors flex items-center gap-2 text-xs font-medium"
             >
               <Languages className="w-4 h-4" />
               {languages.find(l => l.code === lang)?.name || 'Language'}
@@ -195,7 +195,7 @@ export default function App() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-2 w-64 bg-[#fefefb] rounded-2xl border border-[#e7e8e0] shadow-2xl overflow-hidden z-[100]"
+                  className="absolute top-full right-0 mt-2 w-64 bg-[#fefefb] rounded-2xl border border-[#e7e8e0] shadow-[0_4px_18px_#29392f14] overflow-hidden z-[100]"
                 >
                   <div className="p-3 border-b border-[#e7e8e0]">
                     <div className="relative">
@@ -220,7 +220,7 @@ export default function App() {
                           setLangSearch('');
                         }}
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-colors ${
-                          lang === l.code ? 'bg-[#456352] text-white' : 'hover:bg-[#456352]/5'
+                          lang === l.code ? 'bg-[#ac694c] text-white' : 'hover:bg-[#edf1e9]'
                         }`}
                       >
                         <span className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export default function App() {
 
             <button 
               onClick={() => { setFileA(null); setFileB(null); }}
-              className="text-xs uppercase tracking-widest font-mono opacity-50 hover:opacity-100 transition-opacity"
+              className="text-xs font-medium opacity-50 hover:opacity-100 transition-opacity"
             >
               {t.restart || 'Restart'}
             </button>
@@ -267,13 +267,13 @@ export default function App() {
               />
             </div>
             
-            <div className="bg-[#456352] text-white p-12 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-12 overflow-hidden relative shadow-2xl">
+            <div className="bg-[#fefefb] text-[#29392f] p-10 rounded-2xl border border-[#e7e8e0] flex flex-col md:flex-row items-center justify-between gap-10 overflow-hidden relative shadow-[0_4px_18px_#29392f14]">
               <div className="relative z-10 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#fefefb]/10 rounded-full text-[10px] uppercase tracking-widest font-mono">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#fefefb]/10 rounded-full text-[10px] font-medium">
                   <Info className="w-3 h-3" />
                   {t.howToUse}
                 </div>
-                <h2 className="text-4xl font-serif italic">{t.heroTitle}</h2>
+                <h2 className="text-4xl font-semibold italic">{t.heroTitle}</h2>
                 <p className="opacity-70 max-w-md text-lg leading-relaxed">{t.heroDesc}</p>
                 
                 <div className="space-y-4 mt-8">
@@ -293,13 +293,13 @@ export default function App() {
               </div>
               <div className="flex -space-x-6 ltr:space-x-0 rtl:space-x-reverse relative z-10 pr-6">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className={`w-20 h-20 rounded-full border-8 border-[#141414] bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl flex items-center justify-center shadow-xl transform hover:-translate-y-2 transition-transform duration-500 delay-${i * 100}`}>
+                  <div key={i} className={`w-20 h-20 rounded-full border-8 border-[#e7e8e0] bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl flex items-center justify-center shadow-xl transform hover:-translate-y-2 transition-transform duration-500 delay-${i * 100}`}>
                     <User className="w-8 h-8 opacity-40" />
                   </div>
                 ))}
               </div>
               {/* Decorative background elements */}
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f8eee5]0/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#ac694c]/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
               <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#456352]/10 rounded-full -ml-48 -mb-48 blur-[100px]"></div>
             </div>
           </div>
@@ -307,43 +307,43 @@ export default function App() {
           <div className="space-y-8 animate-in fade-in duration-700">
             {/* Comparative Stats */}
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-[#fefefb] overflow-hidden rounded-2xl border border-[#e7e8e0] shadow-sm">
+              <div className="bg-[#fefefb] overflow-hidden rounded-2xl border border-[#e7e8e0] shadow-[0_2px_7px_#344d2508]">
                 <div className="bg-[#456352]/5 px-4 py-2 border-b border-[#e7e8e0] flex justify-between items-center">
                   <span className="text-[10px] uppercase font-mono tracking-widest opacity-50">File A: {fileA.name}</span>
                   <FileText className="w-3 h-3 opacity-30" />
                 </div>
                 <div className="p-4 grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <p className="text-xl font-serif">{fileStats?.a.inds}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.indi}</p>
+                    <p className="text-xl font-semibold">{fileStats?.a.inds}</p>
+                    <p className="text-[10px] opacity-40">{t.indi}</p>
                   </div>
                   <div>
-                    <p className="text-xl font-serif">{fileStats?.a.fams}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.fam}</p>
+                    <p className="text-xl font-semibold">{fileStats?.a.fams}</p>
+                    <p className="text-[10px] opacity-40">{t.fam}</p>
                   </div>
                   <div className="border-r border-[#e7e8e0] ltr:border-r-0 ltr:border-l rtl:border-r">
-                    <p className="text-xl font-serif">{fileStats?.a.total}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.records}</p>
+                    <p className="text-xl font-semibold">{fileStats?.a.total}</p>
+                    <p className="text-[10px] opacity-40">{t.records}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#fefefb] overflow-hidden rounded-2xl border border-[#e7e8e0] shadow-sm">
+              <div className="bg-[#fefefb] overflow-hidden rounded-2xl border border-[#e7e8e0] shadow-[0_2px_7px_#344d2508]">
                 <div className="bg-[#456352]/5 px-4 py-2 border-b border-[#e7e8e0] flex justify-between items-center">
                   <span className="text-[10px] uppercase font-mono tracking-widest opacity-50">{lang === 'he' ? 'קובץ' : 'File'} B: {fileB.name}</span>
                   <FileText className="w-3 h-3 opacity-30" />
                 </div>
                 <div className="p-4 grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <p className="text-xl font-serif">{fileStats?.b.inds}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.indi}</p>
+                    <p className="text-xl font-semibold">{fileStats?.b.inds}</p>
+                    <p className="text-[10px] opacity-40">{t.indi}</p>
                   </div>
                   <div>
-                    <p className="text-xl font-serif">{fileStats?.b.fams}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.fam}</p>
+                    <p className="text-xl font-semibold">{fileStats?.b.fams}</p>
+                    <p className="text-[10px] opacity-40">{t.fam}</p>
                   </div>
                   <div className="border-r border-[#e7e8e0] ltr:border-r-0 ltr:border-l rtl:border-r">
-                    <p className="text-xl font-serif">{fileStats?.b.total}</p>
-                    <p className="text-[9px] uppercase font-mono opacity-40">{t.records}</p>
+                    <p className="text-xl font-semibold">{fileStats?.b.total}</p>
+                    <p className="text-[10px] opacity-40">{t.records}</p>
                   </div>
                 </div>
               </div>
@@ -352,9 +352,9 @@ export default function App() {
             {/* Diff Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard label={t.totalChanges} value={stats?.total || 0} icon={<RefreshCcw className="w-5 h-5" />} color="bg-[#456352]" />
-              <StatCard label={t.added} value={stats?.added || 0} icon={<Plus className="w-5 h-5" />} color="bg-[#edf1e9]0" />
-              <StatCard label={t.removed} value={stats?.removed || 0} icon={<Minus className="w-5 h-5" />} color="bg-[#f8eee5]0" />
-              <StatCard label={t.modified} value={stats?.modified || 0} icon={<AlertCircle className="w-5 h-5" />} color="bg-[#f8eee5]0" />
+              <StatCard label={t.added} value={stats?.added || 0} icon={<Plus className="w-5 h-5" />} color="bg-[#edf1e9]" />
+              <StatCard label={t.removed} value={stats?.removed || 0} icon={<Minus className="w-5 h-5" />} color="bg-[#f8eee5]" />
+              <StatCard label={t.modified} value={stats?.modified || 0} icon={<AlertCircle className="w-5 h-5" />} color="bg-[#f8eee5]" />
             </div>
 
             {/* Filter Bar */}
@@ -364,9 +364,9 @@ export default function App() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-1.5 rounded-md text-xs font-mono uppercase tracking-wider transition-all ${
+                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeTab === tab 
-                        ? 'bg-[#456352] text-white shadow-lg' 
+                        ? 'bg-[#ac694c] text-white shadow-[0_2px_7px_#344d2508]' 
                         : 'text-[#29392f]/50 hover:text-[#29392f]'
                     }`}
                   >
@@ -382,7 +382,7 @@ export default function App() {
                 <input 
                   type="text"
                   placeholder={t.searchPlaceholder}
-                  className="w-full bg-[#f8f7f3] border-none rounded-lg py-2 pr-10 pl-4 text-sm focus:ring-2 focus:ring-[#141414]/10 transition-all placeholder:opacity-30"
+                  className="w-full bg-[#f8f7f3] border-none rounded-lg py-2 pr-10 pl-4 text-sm focus:ring-2 focus:ring-[#b47e59] transition-all placeholder:opacity-30"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -394,7 +394,7 @@ export default function App() {
               {filteredItems.length === 0 ? (
                 <div className="text-center py-20 bg-[#fefefb] rounded-3xl border border-dashed border-[#e7e8e0]">
                   <Info className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                  <p className="text-[#29392f]/40 font-serif italic text-lg">{t.noResults}</p>
+                  <p className="text-[#29392f]/40 text-lg">{t.noResults}</p>
                 </div>
               ) : (
                 filteredItems.map((item) => (
@@ -455,9 +455,9 @@ function UploadCard({ id, label, fileName, onUpload, onDrop, t }: { id: string; 
 
   return (
     <div 
-      className={`relative bg-[#fefefb] p-10 rounded-[3rem] border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center text-center gap-6 group overflow-hidden ${
+      className={`relative bg-[#fefefb] p-10 rounded-2xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center text-center gap-6 group overflow-hidden ${
         isDragging 
-          ? 'border-[#141414] bg-[#456352]/5 scale-[1.02] shadow-2xl' 
+          ? 'border-[#ac694c] bg-[#f8eee5] scale-[1.01] shadow-[0_4px_18px_#29392f14]' 
           : 'border-[#e7e8e0] hover:border-[#d6e2cd] hover:shadow-xl hover:-translate-y-1'
       }`}
       onDragEnter={handleDrag}
@@ -470,24 +470,24 @@ function UploadCard({ id, label, fileName, onUpload, onDrop, t }: { id: string; 
         <motion.div 
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute inset-0 bg-[#456352] text-white flex flex-col items-center justify-center z-10"
+          className="absolute inset-0 bg-[#ac694c] text-white flex flex-col items-center justify-center z-10"
         >
           <FileUp className="w-16 h-16 mb-4 animate-bounce" />
-          <p className="font-serif italic text-xl">{t.dropFiles}</p>
+          <p className="font-semibold text-xl">{t.dropFiles}</p>
         </motion.div>
       )}
 
-      <div className={`p-6 rounded-[2rem] transition-all duration-500 ${
+      <div className={`p-6 rounded-xl transition-all duration-500 ${
         fileName 
           ? 'bg-[#edf1e9] text-green-500 rotate-12' 
-          : 'bg-[#f8f7f3] text-[#29392f]/30 group-hover:bg-[#456352] group-hover:text-white group-hover:-rotate-12'
+          : 'bg-[#edf1e9] text-[#456352]/50 group-hover:bg-[#ac694c] group-hover:text-white'
       }`}>
         {fileName ? <CheckCircle2 className="w-10 h-10" /> : <FileUp className="w-10 h-10" />}
       </div>
       
       <div className="space-y-2">
         <span className="text-[10px] uppercase font-mono tracking-[0.2em] opacity-40 block">{label}</span>
-        <h3 className="font-serif italic text-2xl truncate max-w-[250px]">{fileName || t.chooseFile}</h3>
+        <h3 className="font-semibold text-2xl truncate max-w-[250px]">{fileName || t.chooseFile}</h3>
         <p className="text-[10px] font-mono opacity-30 mt-2 max-w-[200px] mx-auto leading-relaxed">
           {t.dragDrop}
         </p>
@@ -553,13 +553,13 @@ function ClassicDiff({ oldText, newText, t, oldData, newData }: { oldText: strin
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <span className="text-[9px] uppercase font-mono opacity-30 tracking-tight">{t.original}</span>
+        <span className="text-[10px] opacity-30 tracking-tight">{t.original}</span>
         <div className="font-mono text-[11px] whitespace-pre-wrap break-all p-4 bg-[#fefefb] rounded-xl border border-[#e7e8e0] leading-relaxed min-h-[200px] max-h-[500px] overflow-auto">
           {left}
         </div>
       </div>
       <div className="space-y-2">
-        <span className="text-[9px] uppercase font-mono opacity-30 tracking-tight">{t.updated}</span>
+        <span className="text-[10px] opacity-30 tracking-tight">{t.updated}</span>
         <div className="font-mono text-[11px] whitespace-pre-wrap break-all p-4 bg-[#fefefb] rounded-xl border border-[#e7e8e0] leading-relaxed min-h-[200px] max-h-[500px] overflow-auto">
           {right}
         </div>
@@ -576,7 +576,7 @@ function SmartDiff({ record, t, lang }: { record: any, t: any, lang: string }) {
         const newValue = typeof change.newValue === 'object' ? JSON.stringify(change.newValue) : String(change.newValue || '-');
 
         return (
-          <div key={i} className="group flex flex-col md:flex-row gap-4 p-5 bg-[#fefefb] rounded-2xl border border-[#e7e8e0] transition-all hover:border-[#d6e2cd] shadow-sm">
+          <div key={i} className="group flex flex-col md:flex-row gap-4 p-5 bg-[#fefefb] rounded-2xl border border-[#e7e8e0] transition-all hover:border-[#d6e2cd] shadow-[0_2px_7px_#344d2508]">
             <div className="md:w-1/4">
               <span className="text-[10px] font-mono font-bold text-[#29392f]/30 uppercase tracking-[0.2em] block mb-2">{change.humanKey}</span>
               <div className="w-8 h-1 bg-amber-200 rounded-full group-hover:w-12 transition-all"></div>
@@ -584,7 +584,7 @@ function SmartDiff({ record, t, lang }: { record: any, t: any, lang: string }) {
             
             <div className="flex-1 grid md:grid-cols-[1fr,auto,1fr] items-center gap-6">
               <div className="bg-[#f8eee5]/30 p-3 rounded-lg border border-red-100/30">
-                <p className="text-[9px] uppercase font-mono opacity-30 mb-1">{t.original}</p>
+                <p className="text-[10px] opacity-30 mb-1">{t.original}</p>
                 <p className="text-sm text-[#93583f]/60 line-through truncate" title={oldValue}>{oldValue}</p>
               </div>
               
@@ -593,7 +593,7 @@ function SmartDiff({ record, t, lang }: { record: any, t: any, lang: string }) {
               </div>
               
               <div className="bg-[#edf1e9]/50 p-3 rounded-lg border border-green-100/50">
-                <p className="text-[9px] uppercase font-mono opacity-30 mb-1">{t.updated}</p>
+                <p className="text-[10px] opacity-30 mb-1">{t.updated}</p>
                 <p className="text-sm font-medium text-[#315b48]" title={newValue}>{newValue}</p>
               </div>
             </div>
@@ -632,7 +632,7 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
             {item.type === 'modified' && (
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {item.changes.slice(0, 3).map((change: any, i: number) => (
-                  <span key={i} className="text-[9px] px-1.5 py-0.5 bg-[#f8eee5] text-[#ac694c]/60 rounded font-mono uppercase tracking-tighter shadow-sm border border-amber-100/50">
+                  <span key={i} className="text-[9px] px-1.5 py-0.5 bg-[#f8eee5] text-[#ac694c]/60 rounded font-mono uppercase tracking-tighter shadow-[0_2px_7px_#344d2508] border border-amber-100/50">
                     {change.humanKey}
                   </span>
                 ))}
@@ -674,7 +674,7 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
                   <button 
                     onClick={() => setViewMode('smart')}
                     className={`px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-wider flex items-center gap-2 transition-all ${
-                      viewMode === 'smart' ? 'bg-[#fefefb] text-[#29392f] shadow-sm' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
+                      viewMode === 'smart' ? 'bg-[#fefefb] text-[#29392f] shadow-[0_2px_7px_#344d2508]' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
                     }`}
                   >
                     <Eye className="w-3 h-3" />
@@ -683,7 +683,7 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
                   <button 
                     onClick={() => setViewMode('diff')}
                     className={`px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-wider flex items-center gap-2 transition-all ${
-                      viewMode === 'diff' ? 'bg-[#fefefb] text-[#29392f] shadow-sm' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
+                      viewMode === 'diff' ? 'bg-[#fefefb] text-[#29392f] shadow-[0_2px_7px_#344d2508]' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
                     }`}
                   >
                     <RefreshCcw className="w-3 h-3" />
@@ -692,7 +692,7 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
                   <button 
                     onClick={() => setViewMode('raw')}
                     className={`px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-wider flex items-center gap-2 transition-all ${
-                      viewMode === 'raw' ? 'bg-[#fefefb] text-[#29392f] shadow-sm' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
+                      viewMode === 'raw' ? 'bg-[#fefefb] text-[#29392f] shadow-[0_2px_7px_#344d2508]' : 'text-[#29392f]/40 hover:text-[#29392f]/60'
                     }`}
                   >
                     <Code2 className="w-3 h-3" />
@@ -750,10 +750,10 @@ function DiffRecord({ item, t, lang, getDisplayName, expanded, onToggle }: any) 
 
 function StatCard({ label, value, icon, color }: { label: string; value: number | string; icon: ReactNode; color: string }) {
   return (
-    <div className="bg-[#fefefb] p-4 rounded-2xl border border-[#e7e8e0] shadow-sm flex items-center justify-between">
+    <div className="bg-[#fefefb] p-4 rounded-2xl border border-[#e7e8e0] shadow-[0_2px_7px_#344d2508] flex items-center justify-between">
       <div>
         <p className="text-[10px] uppercase font-mono tracking-wider opacity-40">{label}</p>
-        <p className="text-2xl font-serif italic">{value}</p>
+        <p className="text-2xl font-semibold italic">{value}</p>
       </div>
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${color}`}>
         {icon}
