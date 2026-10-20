@@ -6,6 +6,8 @@ on:
       - main
     paths-ignore:
       - 'docs/**'
+      - 'assets/**'
+      - 'index.html'
   workflow_dispatch:
 
 permissions:
@@ -21,8 +23,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -38,19 +38,32 @@ jobs:
         env:
           BASE_URL: ./
 
-      - name: Publish dist into docs/
+      - name: Publish build to main root + docs
         run: |
           set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Keep Vite entry for local dev
+          cp index.html index.vite.html
+
+          # Production site at repo root (for branch-based Pages from main)
+          cp dist/index.html index.html
+          rm -rf assets
+          mkdir -p assets
+          cp -R dist/assets/* assets/
+          touch .nojekyll
+
+          # Also keep docs/ copy
           rm -rf docs
           mkdir -p docs
           cp -R dist/* docs/
           touch docs/.nojekyll
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs
+
+          git add index.html index.vite.html assets docs .nojekyll
           if git diff --cached --quiet; then
-            echo "No docs changes"
+            echo "No changes"
             exit 0
           fi
-          git commit -m "build: publish production site to docs/ for GitHub Pages"
+          git commit -m "build: production site on main (root + docs) for GitHub Pages"
           git push origin HEAD:main
