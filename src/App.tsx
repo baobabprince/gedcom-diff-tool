@@ -240,6 +240,15 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-4 relative">
+            <a
+              href="https://baobabprince.github.io/anafim/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg border border-[#e7e8e0] bg-[#fefefb] text-[#456352] text-xs font-semibold hover:bg-[#edf1e9] transition-colors no-underline"
+              title={lang === 'he' || lang === 'he-IL' ? 'פתיחת אותו אילן במבט משפחתי' : 'Open the same tree in family view'}
+            >
+              {(lang === 'he' || lang === 'he-IL') ? 'אילן המשפחה' : 'Family tree'}
+            </a>
             <button 
               onClick={() => setShowLanguagePicker(!showLanguagePicker)}
               className="p-2 hover:bg-[#456352]/5 rounded-lg transition-colors flex items-center gap-2 text-xs font-medium"
