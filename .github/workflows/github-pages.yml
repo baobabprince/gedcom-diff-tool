@@ -20,83 +20,47 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Use Vite source entry for build
-        run: |
-          # Production index.html points at hashed assets; Vite needs /src/main.tsx
-          if [ -f index.vite.html ]; then
-            cp index.vite.html index.html
-          else
-            cat > index.html << 'EOF'
-          <!doctype html>
-          <html lang="he" dir="rtl">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>GED Diff</title>
-            </head>
-            <body>
-              <div id="root"></div>
-              <script type="module" src="/src/main.tsx"></script>
-            </body>
-          </html>
-          EOF
-          fi
+      - name: Restore Vite entry before build
+        run: cp index.vite.html index.html
 
       - name: Build
         run: npm run build
         env:
           BASE_URL: ./
 
-      - name: Publish build to main root + docs
+      - name: Publish to main root + docs
         run: |
-          set -euo pipefail
+          set -eux
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Restore/ensure Vite entry for next builds
-          if [ ! -f index.vite.html ] || ! grep -q 'src/main.tsx' index.vite.html; then
-            cat > index.vite.html << 'EOF'
-          <!doctype html>
-          <html lang="he" dir="rtl">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>GED Diff — השוואת קבצי GEDCOM</title>
-            </head>
-            <body class="bg-[#f8f7f3] text-[#29392f]">
-              <div id="root"></div>
-              <script type="module" src="/src/main.tsx"></script>
-            </body>
-          </html>
-          EOF
-          fi
+          git pull --rebase origin main || true
 
           cp dist/index.html index.html
           rm -rf assets
           mkdir -p assets
-          cp -R dist/assets/* assets/
+          cp -R dist/assets/. assets/
           touch .nojekyll
 
           rm -rf docs
           mkdir -p docs
-          cp -R dist/* docs/
+          cp -R dist/. docs/
           touch docs/.nojekyll
+
+          # Keep source entry for next CI builds
+          test -f index.vite.html
 
           git add index.html index.vite.html assets docs .nojekyll
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No changes to publish"
             exit 0
           fi
           git commit -m "build: production site on main (root + docs) for GitHub Pages"
