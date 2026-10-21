@@ -1,0 +1,26 @@
+name: Family tree nav
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/add-family-tree-nav.yml'
+      - 'scripts/add-family-tree-nav.py'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/add-family-tree-nav.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/App.tsx
+          git diff --cached --quiet && exit 0
+          git commit -m "ui(nav): אילן המשפחה header link to anafim"
+          git push origin HEAD:main
